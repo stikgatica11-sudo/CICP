@@ -1,886 +1,274 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Enteros Cuestionario</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh; padding: 20px; color: #333;
-}
-.container { max-width: 700px; margin: 0 auto; }
-.header { text-align: center; color: #fff; padding: 30px 20px; }
-.header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-.header .meta { font-size: 14px; opacity: 0.9; }
-.progress-bar { background: rgba(255,255,255,0.3); border-radius: 10px; height: 8px; margin: 20px 0; overflow: hidden; }
-.progress-fill { background: #fff; height: 100%; width: 0%; transition: width 0.4s ease; border-radius: 10px; }
-.question { background: #fff; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: none; }
-.question.active { display: block; }
-.q-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 13px; color: #888; }
-.q-number { font-weight: 600; color: #667eea; }
-.q-text { font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 25px; color: #222; }
-.options { display: flex; flex-direction: column; gap: 12px; }
-.option-wrapper { display: flex; flex-direction: column; }
-.option {
-  display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px;
-  border: 2px solid #e8e8e8; border-radius: 12px; background: #fafafa;
-  cursor: pointer; transition: all 0.2s; text-align: left; font-size: 15px; width: 100%;
-}
-[dir="rtl"] .option { text-align: right; flex-direction: row-reverse; }
-.option:hover:not(.disabled) { border-color: #667eea; background: #f5f3ff; }
-.option.selected { border-color: #667eea; background: #ede9fe; }
-.option.correct { border-color: #22c55e; background: #dcfce7; }
-.option.incorrect { border-color: #ef4444; background: #fee2e2; }
-.option.disabled { cursor: default; }
-.option.show-correct { border-color: #22c55e; background: #dcfce7; }
-.opt-label {
-  display: flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; border-radius: 50%; background: #e8e8e8;
-  font-weight: 700; font-size: 14px; flex-shrink: 0;
-}
-.option.selected .opt-label { background: #667eea; color: #fff; }
-.option.correct .opt-label { background: #22c55e; color: #fff; }
-.option.incorrect .opt-label { background: #ef4444; color: #fff; }
-.option.show-correct .opt-label { background: #22c55e; color: #fff; }
-.opt-text { padding-top: 5px; line-height: 1.5; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material de Estudio - Colegio Ignacio Carrera Pinto</title>
+    <style>
+        /* --- VARIABLES PARA EDICIÓN RÁPIDA --- */
+        :root {
+            --color-primario: #2c3e50;    /* Azul oscuro profesional */
+            --color-secundario: #3498db;  /* Azul educativo */
+            --color-acento: #e67e22;      /* Naranja para botones y realces */
+            --color-fondo: #f4f7f6;      /* Gris muy claro */
+            --fuente-principal: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-/* Individual option feedback */
-.option-feedback {
-  margin: 8px 0 4px 46px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
-}
-[dir="rtl"] .option-feedback { margin-left: 0; margin-right: 46px; }
-.option-feedback.correct-feedback {
-  background: #dcfce7;
-  border-left: 3px solid #22c55e;
-}
-.option-feedback.incorrect-feedback {
-  background: #fef3f2;
-  border-left: 3px solid #fca5a5;
-}
-[dir="rtl"] .option-feedback.correct-feedback,
-[dir="rtl"] .option-feedback.incorrect-feedback {
-  border-left: none;
-  border-right: 3px solid;
-}
-[dir="rtl"] .option-feedback.correct-feedback { border-right-color: #22c55e; }
-[dir="rtl"] .option-feedback.incorrect-feedback { border-right-color: #fca5a5; }
-.feedback-status {
-  font-weight: 600;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.feedback-status.correct { color: #166534; }
-.feedback-status.incorrect { color: #991b1b; }
-.feedback-rationale { color: #444; }
+        /* --- ESTILOS GENERALES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-/* Hint box */
-.hint-box {
-  margin: 12px 0;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #fffbeb;
-  border: 1px solid #fcd34d;
-}
-.hint-toggle {
-  width: 100%;
-  padding: 10px 16px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: #92400e;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.hint-toggle:hover { background: #fef3c7; }
-.hint-content {
-  padding: 0 16px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s, padding 0.3s;
-  font-size: 14px;
-  color: #78350f;
-  line-height: 1.5;
-}
-.hint-box.show .hint-content {
-  padding: 0 16px 12px;
-  max-height: 200px;
-}
+        body {
+            font-family: var(--fuente-principal);
+            background-color: var(--color-fondo);
+            color: var(--color-primario);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Asegura que el footer se mantenga abajo */
+        }
 
-.next-btn {
-  margin-top: 20px; width: 100%; padding: 14px;
-  background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none;
-  border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.next-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102,126,234,0.4); }
-.hidden { display: none !important; }
-.results { background: #fff; border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: none; }
-.results.active { display: block; }
-.results h2 { font-size: 28px; margin-bottom: 10px; color: #333; }
-.results .score { font-size: 64px; font-weight: 700; color: #667eea; margin: 20px 0; }
-.results .score-text { font-size: 18px; color: #666; margin-bottom: 30px; }
-.restart-btn {
-  padding: 14px 40px; background: linear-gradient(135deg, #667eea, #764ba2);
-  color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;
-}
+        header {
+            background-color: var(--color-primario);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-/* Math CSS */
-.math, .math-block { font-family: "Cambria Math", "Times New Roman", Times, serif; font-style: italic; }
-.math-block { display: block; text-align: center; margin: 10px 0; font-size: 110%; }
-.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 3px; font-size: 0.9em; }
-.frac-num { border-bottom: 1px solid currentColor; padding: 0 4px 2px; line-height: 1.2; }
-.frac-den { padding: 2px 4px 0; line-height: 1.2; }
-.sqrt { white-space: nowrap; }
-.sqrt-content { border-top: 1px solid currentColor; padding: 0 3px; margin-left: 2px; }
-sup, sub { font-size: 0.75em; }
-sup { vertical-align: super; }
-sub { vertical-align: sub; }
-</style>
+        main {
+            flex: 1; /* Empuja el footer hacia abajo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        /* --- ESTILOS DE BOTONES Y MENÚ PRINCIPAL --- */
+        .menu-cursos {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .btn-curso {
+            background-color: white;
+            color: var(--color-primario);
+            border: 2px solid var(--color-secundario);
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .btn-curso:hover {
+            background-color: var(--color-secundario);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        /* --- SECCIONES DE MATERIAL (OCULTAS POR DEFECTO) --- */
+        .seccion-material {
+            display: none; /* Se activa con JS */
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: left;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lista-cuestionarios {
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+
+        .lista-cuestionarios li {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .lista-cuestionarios a {
+            color: var(--color-secundario);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lista-cuestionarios a:hover {
+            color: var(--color-acento);
+            text-decoration: underline;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--color-primario);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .footer-line { margin: 5px 0; }
+        .profesor-nombre { font-weight: bold; color: var(--color-primario); }
+
+        /* --- RESPONSIVO --- */
+        @media (max-width: 480px) {
+            header h1 { font-size: 1.5rem; }
+            .btn-curso { padding: 1.2rem; font-size: 1rem; }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <h1>Enteros Cuestionario</h1>
-    <div class="meta">10 questions</div>
-    <div class="progress-bar"><div class="progress-fill"></div></div>
-  </div>
-  <div id="quiz-container">
-        <div class="question" data-index="0">
-          <div class="q-header">
-            <span class="q-number">Question 1</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">¿Cuál es la regla de los signos que se debe aplicar al multiplicar un número entero positivo por uno negativo, como en el caso de las deudas repetidas?</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Recuerda el análisis de error de la misión donde se corregía el cálculo de <span class="math">3 × (-2.000)</span>.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="false" data-rationale="Esta regla aplica para la suma y resta de enteros, pero en la multiplicación el signo se determina únicamente por la combinación de los signos de los factores.">
-            <span class="opt-label">A</span>
-            <span class="opt-text">El signo depende de cuál número es mayor.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Esta regla aplica para la suma y resta de enteros, pero en la multiplicación el signo se determina únicamente por la combinación de los signos de los factores.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="false" data-rationale="El cero solo se obtiene si uno de los factores es cero, independientemente de si los otros son positivos o negativos.">
-            <span class="opt-label">B</span>
-            <span class="opt-text">El resultado es siempre cero.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">El cero solo se obtiene si uno de los factores es cero, independientemente de si los otros son positivos o negativos.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="false" data-rationale="Este es un error común que ignora la naturaleza de la deuda; multiplicar un valor negativo por una cantidad de veces positiva mantiene el sentido negativo.">
-            <span class="opt-label">C</span>
-            <span class="opt-text">El resultado siempre es positivo.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Este es un error común que ignora la naturaleza de la deuda; multiplicar un valor negativo por una cantidad de veces positiva mantiene el sentido negativo.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="true" data-rationale="La multiplicación de factores con signos distintos resulta en un producto negativo, representando una acumulación de deuda o pérdida.">
-            <span class="opt-label">D</span>
-            <span class="opt-text">El resultado siempre es negativo.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">La multiplicación de factores con signos distintos resulta en un producto negativo, representando una acumulación de deuda o pérdida.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      
-        <div class="question" data-index="1">
-          <div class="q-header">
-            <span class="q-number">Question 2</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">En una operación combinada como <span class="math">+15.000 + (5 × -2.000) - 3.000</span>, ¿qué parte del ejercicio debe resolverse en primer lugar según la prioridad de operaciones?</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Considera el orden estándar de las operaciones: paréntesis, potencias, multiplicación/división y finalmente suma/resta.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="true" data-rationale="En la jerarquía de operaciones matemáticas, las multiplicaciones y divisiones deben resolverse antes que las sumas y restas.">
-            <span class="opt-label">A</span>
-            <span class="opt-text">La multiplicación: <span class="math">(5 × -2.000)</span>.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">En la jerarquía de operaciones matemáticas, las multiplicaciones y divisiones deben resolverse antes que las sumas y restas.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="false" data-rationale="Seguir el orden de lectura ignorando la jerarquía (como multiplicar antes de sumar) conduce a resultados financieros erróneos.">
-            <span class="opt-label">B</span>
-            <span class="opt-text">Se resuelve estrictamente de izquierda a derecha sin importar la operación.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Seguir el orden de lectura ignorando la jerarquía (como multiplicar antes de sumar) conduce a resultados financieros erróneos.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="false" data-rationale="Resolver las restas al principio suele ser incorrecto a menos que estén dentro de un paréntesis prioritario.">
-            <span class="opt-label">C</span>
-            <span class="opt-text">La resta final: <span class="math">- 3.000</span>.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Resolver las restas al principio suele ser incorrecto a menos que estén dentro de un paréntesis prioritario.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="false" data-rationale="Agrupar un número independiente con un factor de una multiplicación antes de realizar esta última rompe la prioridad de las operaciones.">
-            <span class="opt-label">D</span>
-            <span class="opt-text">La primera suma: <span class="math">15.000 + 5</span>.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Agrupar un número independiente con un factor de una multiplicación antes de realizar esta última rompe la prioridad de las operaciones.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      
-        <div class="question" data-index="2">
-          <div class="q-header">
-            <span class="q-number">Question 3</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">Si un jugador de videojuegos comete <span class="math">12</span> errores y cada error le resta <span class="math">5</span> puntos, ¿cuál es la operación correcta con números enteros para calcular su puntaje total perdido?</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Busca la operación que represente una 'deuda repetida' o pérdida acumulada.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="false" data-rationale="Sumar los valores solo indicaría un error y una resta simple, no la repetición de la pérdida por cada uno de los doce errores.">
-            <span class="opt-label">A</span>
-            <span class="opt-text"><span class="math">12 + (-5)</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Sumar los valores solo indicaría un error y una resta simple, no la repetición de la pérdida por cada uno de los doce errores.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="true" data-rationale="La cantidad de eventos (errores) se multiplica por el valor negativo que representa la pérdida de puntos por cada uno.">
-            <span class="opt-label">B</span>
-            <span class="opt-text"><span class="math">12 × (-5)</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">La cantidad de eventos (errores) se multiplica por el valor negativo que representa la pérdida de puntos por cada uno.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="false" data-rationale="Multiplicar dos números negativos resultaría en un puntaje positivo, lo cual no tiene sentido en un contexto de pérdida de puntos.">
-            <span class="opt-label">C</span>
-            <span class="opt-text"><span class="math">-12 × (-5)</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Multiplicar dos números negativos resultaría en un puntaje positivo, lo cual no tiene sentido en un contexto de pérdida de puntos.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="false" data-rationale="La división se usa para repartir una deuda, no para calcular el acumulado de puntos perdidos por múltiples fallos.">
-            <span class="opt-label">D</span>
-            <span class="opt-text"><span class="math">12 ÷ (-5)</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">La división se usa para repartir una deuda, no para calcular el acumulado de puntos perdidos por múltiples fallos.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      
-        <div class="question" data-index="3">
-          <div class="q-header">
-            <span class="q-number">Question 4</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">Calcula el saldo final de una cuenta que inicia con <span class="math">+12.000</span>, tiene una deuda repetida de <span class="math">3 × (-4.000)</span> y recibe un depósito de <span class="math">+2.000</span>.</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Primero determina el valor total de la deuda multiplicando y luego suma los valores positivos.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="true" data-rationale="Al resolver $3 \times -4.000 = -12.000$, el saldo inicial se anula ($12.000 - 12.000 = 0$), quedando solo el depósito final de $2.000$.">
-            <span class="opt-label">A</span>
-            <span class="opt-text"><span class="math">+2.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Al resolver <span class="math">3 × -4.000 = -12.000</span>, el saldo inicial se anula (<span class="math">12.000 - 12.000 = 0</span>), quedando solo el depósito final de <span class="math">2.000</span>.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="false" data-rationale="Este valor implicaría que los gastos superaron a los ingresos, lo cual no ocurre ya que los positivos y el gasto principal se equilibran antes del depósito.">
-            <span class="opt-label">B</span>
-            <span class="opt-text"><span class="math">-2.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Este valor implicaría que los gastos superaron a los ingresos, lo cual no ocurre ya que los positivos y el gasto principal se equilibran antes del depósito.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="false" data-rationale="Aunque la deuda y el saldo inicial se cancelan, este resultado olvida incluir el depósito final de $+2.000$.">
-            <span class="opt-label">C</span>
-            <span class="opt-text"><span class="math">0</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Aunque la deuda y el saldo inicial se cancelan, este resultado olvida incluir el depósito final de <span class="math">+2.000</span>.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="false" data-rationale="Este resultado asume erróneamente que la multiplicación de $3 \times (-4.000)$ es positiva, sumando deudas en lugar de restarlas.">
-            <span class="opt-label">D</span>
-            <span class="opt-text"><span class="math">+26.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Este resultado asume erróneamente que la multiplicación de <span class="math">3 × (-4.000)</span> es positiva, sumando deudas en lugar de restarlas.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      
-        <div class="question" data-index="4">
-          <div class="q-header">
-            <span class="q-number">Question 5</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">Una empresa tiene una pérdida total de <span class="math">-\</span> 24.000<span class="math"> distribuida en </span>6$ meses de forma igualitaria. ¿Cómo se expresa matemáticamente el gasto mensual?</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Recuerda que repartir una cantidad en partes iguales requiere una división.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="false" data-rationale="La multiplicación aumentaría la deuda total en lugar de repartirla entre los meses del periodo.">
-            <span class="opt-label">A</span>
-            <span class="opt-text"><span class="math">-24.000 × 6 = -144.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">La multiplicación aumentaría la deuda total en lugar de repartirla entre los meses del periodo.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="true" data-rationale="Dividir una deuda (negativo) por un número de meses (positivo) resulta en una deuda mensual representada por un número negativo.">
-            <span class="opt-label">B</span>
-            <span class="opt-text"><span class="math">-24.000 ÷ 6 = -4.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Dividir una deuda (negativo) por un número de meses (positivo) resulta en una deuda mensual representada por un número negativo.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="false" data-rationale="Un resultado positivo indicaría una ganancia mensual, lo cual contradice la situación de pérdida total inicial.">
-            <span class="opt-label">C</span>
-            <span class="opt-text"><span class="math">-24.000 ÷ 6 = +4.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Un resultado positivo indicaría una ganancia mensual, lo cual contradice la situación de pérdida total inicial.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="false" data-rationale="Restar la cantidad de meses del monto total no es el procedimiento correcto para distribuir o promediar una cifra en el tiempo.">
-            <span class="opt-label">D</span>
-            <span class="opt-text"><span class="math">24.000 - 6 = 23.994</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Restar la cantidad de meses del monto total no es el procedimiento correcto para distribuir o promediar una cifra en el tiempo.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      
-        <div class="question" data-index="5">
-          <div class="q-header">
-            <span class="q-number">Question 6</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">Resuelve el siguiente desafío de nivel experto: <span class="math">+30.000 + (4 × -5.000) + (2 × 2.500) - 10.000</span>.</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Resuelve las dos multiplicaciones primero, una te dará un valor negativo y la otra uno positivo.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="false" data-rationale="Obtener un valor negativo sugeriría que los gastos fueron mayores a los ingresos disponibles, lo cual no coincide con las cifras dadas.">
-            <span class="opt-label">A</span>
-            <span class="opt-text"><span class="math">-5.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Obtener un valor negativo sugeriría que los gastos fueron mayores a los ingresos disponibles, lo cual no coincide con las cifras dadas.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="true" data-rationale="Los cálculos son: $4 \times -5.000 = -20.000$ y $2 \times 2.500 = 5.000$. Al sumar: $30.000 - 20.000 + 5.000 - 10.000 = 5.000$.">
-            <span class="opt-label">B</span>
-            <span class="opt-text"><span class="math">+5.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Los cálculos son: <span class="math">4 × -5.000 = -20.000</span> y <span class="math">2 × 2.500 = 5.000</span>. Al sumar: <span class="math">30.000 - 20.000 + 5.000 - 10.000 = 5.000</span>.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="false" data-rationale="Este error puede surgir al no restar el gasto final de $10.000$ o al calcular incorrectamente una de las multiplicaciones.">
-            <span class="opt-label">C</span>
-            <span class="opt-text"><span class="math">+15.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Este error puede surgir al no restar el gasto final de <span class="math">10.000</span> o al calcular incorrectamente una de las multiplicaciones.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="false" data-rationale="Resultado probable si se ignora el signo negativo en la deuda de $(4 \times -5.000)$ y se suma como si fuera un ingreso.">
-            <span class="opt-label">D</span>
-            <span class="opt-text"><span class="math">+25.000</span></span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Resultado probable si se ignora el signo negativo en la deuda de <span class="math">(4 × -5.000)</span> y se suma como si fuera un ingreso.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      
-        <div class="question" data-index="6">
-          <div class="q-header">
-            <span class="q-number">Question 7</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">¿Cuál es la interpretación correcta si al validar un problema financiero el resultado final es <span class="math">+\</span> 6.000$?</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Piensa en lo que simboliza el signo '<span class="math">+</span>' en un cajero automático o una aplicación bancaria.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="true" data-rationale="En el sistema de números enteros aplicado a finanzas, los resultados positivos representan excedentes o dinero disponible.">
-            <span class="opt-label">A</span>
-            <span class="opt-text">Se obtuvo una ganancia o saldo a favor.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">En el sistema de números enteros aplicado a finanzas, los resultados positivos representan excedentes o dinero disponible.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="false" data-rationale="Un saldo de cero se conoce como neutro, mientras que $+6.000$ indica claramente un valor por encima del punto de equilibrio.">
-            <span class="opt-label">B</span>
-            <span class="opt-text">La cuenta quedó exactamente en cero.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Un saldo de cero se conoce como neutro, mientras que <span class="math">+6.000</span> indica claramente un valor por encima del punto de equilibrio.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="false" data-rationale="Gastar más de lo ingresado resultaría en un número negativo (déficit), no en uno positivo.">
-            <span class="opt-label">C</span>
-            <span class="opt-text">Se gastó más de lo que se ingresó.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Gastar más de lo ingresado resultaría en un número negativo (déficit), no en uno positivo.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="false" data-rationale="Las deudas se representan con signos negativos; un signo positivo indica posesión de fondos, no obligación de pago.">
-            <span class="opt-label">D</span>
-            <span class="opt-text">Existe una deuda pendiente de cobrar.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Las deudas se representan con signos negativos; un signo positivo indica posesión de fondos, no obligación de pago.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      
-        <div class="question" data-index="7">
-          <div class="q-header">
-            <span class="q-number">Question 8</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">Al analizar el error de un compañero, observas que escribió: <span class="math">(-6.000) ÷ 3 = +2.000</span>. ¿Qué concepto falló en su validación?</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Observa los signos de los números que se están dividiendo y compáralos con el signo del resultado.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="false" data-rationale="Aunque es un problema de enteros, el fallo específico radica en la aplicación de las leyes algebraicas de los signos.">
-            <span class="opt-label">A</span>
-            <span class="opt-text">La interpretación de números reales.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Aunque es un problema de enteros, el fallo específico radica en la aplicación de las leyes algebraicas de los signos.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="false" data-rationale="En este caso solo hay una operación, por lo que no hay conflicto de jerarquía u orden de resolución.">
-            <span class="opt-label">B</span>
-            <span class="opt-text">La prioridad de las operaciones.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">En este caso solo hay una operación, por lo que no hay conflicto de jerarquía u orden de resolución.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="true" data-rationale="Al dividir un número negativo por uno positivo, el cociente debe ser obligatoriamente negativo.">
-            <span class="opt-label">C</span>
-            <span class="opt-text">La regla de signos para la división de enteros.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Al dividir un número negativo por uno positivo, el cociente debe ser obligatoriamente negativo.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="false" data-rationale="El valor numérico ($2.000$) es correcto ($6.000 \div 3 = 2.000$), por lo que el error no es de cálculo sino de signo.">
-            <span class="opt-label">D</span>
-            <span class="opt-text">El cálculo aritmético de la división.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">El valor numérico (<span class="math">2.000</span>) es correcto (<span class="math">6.000 ÷ 3 = 2.000</span>), por lo que el error no es de cálculo sino de signo.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      
-        <div class="question" data-index="8">
-          <div class="q-header">
-            <span class="q-number">Question 9</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">En el 'Nivel 5 - Desafío Combinado', ¿por qué es útil separar los ingresos de los gastos antes de dar el resultado final?</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Es una estrategia visual mencionada en la Diapositiva 14 para ordenar el 'Dashboard'.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="false" data-rationale="Organizar los datos no cambia el valor del resultado final; si los gastos son mayores, el resultado seguirá siendo negativo.">
-            <span class="opt-label">A</span>
-            <span class="opt-text">Para que el resultado siempre sea positivo.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Organizar los datos no cambia el valor del resultado final; si los gastos son mayores, el resultado seguirá siendo negativo.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="false" data-rationale="No es obligatorio, es una estrategia sugerida para mejorar la precisión, pero se puede resolver de otras formas válidas.">
-            <span class="opt-label">B</span>
-            <span class="opt-text">Porque es obligatorio por ley matemática.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">No es obligatorio, es una estrategia sugerida para mejorar la precisión, pero se puede resolver de otras formas válidas.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="true" data-rationale="Agrupar positivos por un lado y negativos por otro permite realizar una única resta final, reduciendo la probabilidad de errores procedimentales.">
-            <span class="opt-label">C</span>
-            <span class="opt-text">Para facilitar la organización lógica y evitar errores de signo.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Agrupar positivos por un lado y negativos por otro permite realizar una única resta final, reduciendo la probabilidad de errores procedimentales.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="false" data-rationale="Las multiplicaciones deben realizarse primero de todos modos; la organización de ingresos y gastos ocurre después de resolver los productos.">
-            <span class="opt-label">D</span>
-            <span class="opt-text">Para evitar tener que multiplicar.</span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Las multiplicaciones deben realizarse primero de todos modos; la organización de ingresos y gastos ocurre después de resolver los productos.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      
-        <div class="question" data-index="9">
-          <div class="q-header">
-            <span class="q-number">Question 10</span>
-            <span class="q-of">/ 10</span>
-          </div>
-          <div class="q-text">Si una 'Misión Final' comienza con un saldo de <span class="math">+\</span> 20.000<span class="math"> y se ejecutan </span>6<span class="math"> movimientos de </span>-\<span class="math"> 2.500</span>, ¿cuánto dinero queda disponible antes de considerar cualquier otro ingreso o gasto extra?</div>
-          
-        <div class="hint-box">
-          <button class="hint-toggle" onclick="this.parentElement.classList.toggle('show')">
-            💡 Hint
-          </button>
-          <div class="hint-content">Primero multiplica la cantidad de movimientos por su valor negativo y súmalo al saldo inicial.</div>
-        </div>
-      
-          <div class="options">
-        <div class="option-wrapper">
-          <button class="option" data-label="A" data-correct="true" data-rationale="El gasto total es $6 \times 2.500 = 15.000$. Al restar esto del saldo inicial ($20.000 - 15.000$), quedan $5.000$.">
-            <span class="opt-label">A</span>
-            <span class="opt-text"><span class="math">+\</span> 5.000$</span>
-          </button>
-          <div class="option-feedback hidden" data-for="A">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">El gasto total es <span class="math">6 × 2.500 = 15.000</span>. Al restar esto del saldo inicial (<span class="math">20.000 - 15.000</span>), quedan <span class="math">5.000</span>.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="B" data-correct="false" data-rationale="Este error ocurre si solo se resta un movimiento de $2.500$ en lugar de los seis que indica el problema.">
-            <span class="opt-label">B</span>
-            <span class="opt-text"><span class="math">+\</span> 17.500$</span>
-          </button>
-          <div class="option-feedback hidden" data-for="B">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Este error ocurre si solo se resta un movimiento de <span class="math">2.500</span> en lugar de los seis que indica el problema.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="C" data-correct="false" data-rationale="Este valor representa el total gastado en los movimientos, no el saldo que queda en la cuenta después de realizarlos.">
-            <span class="opt-label">C</span>
-            <span class="opt-text"><span class="math">+\</span> 15.000$</span>
-          </button>
-          <div class="option-feedback hidden" data-for="C">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Este valor representa el total gastado en los movimientos, no el saldo que queda en la cuenta después de realizarlos.</div>
-          </div>
-        </div>
-      
-        <div class="option-wrapper">
-          <button class="option" data-label="D" data-correct="false" data-rationale="Este resultado sugeriría que el saldo inicial no fue suficiente para cubrir los movimientos, lo cual es falso ya que $20.000 &gt; 15.000$.">
-            <span class="opt-label">D</span>
-            <span class="opt-text"><span class="math">-\</span> 5.000$</span>
-          </button>
-          <div class="option-feedback hidden" data-for="D">
-            <div class="feedback-status"></div>
-            <div class="feedback-rationale">Este resultado sugeriría que el saldo inicial no fue suficiente para cubrir los movimientos, lo cual es falso ya que <span class="math">20.000 &gt; 15.000</span>.</div>
-          </div>
-        </div>
-      </div>
-          <button class="next-btn hidden">Next Question →</button>
-        </div>
-      </div>
-  <div class="results" id="results">
-    <h2>Quiz Complete!</h2>
-    <div class="score" id="score">0%</div>
-    <div class="score-text" id="score-text"></div>
-    <button class="restart-btn" onclick="restart()">Try Again</button>
-  </div>
-</div>
-<script>
-const quizData = [{"question":"¿Cuál es la regla de los signos que se debe aplicar al multiplicar un número entero positivo por uno negativo, como en el caso de las deudas repetidas?","hint":"Recuerda el análisis de error de la misión donde se corregía el cálculo de $3 \\times (-2.000)$.","options":[{"label":"A","text":"El signo depende de cuál número es mayor.","isCorrect":false,"rationale":"Esta regla aplica para la suma y resta de enteros, pero en la multiplicación el signo se determina únicamente por la combinación de los signos de los factores."},{"label":"B","text":"El resultado es siempre cero.","isCorrect":false,"rationale":"El cero solo se obtiene si uno de los factores es cero, independientemente de si los otros son positivos o negativos."},{"label":"C","text":"El resultado siempre es positivo.","isCorrect":false,"rationale":"Este es un error común que ignora la naturaleza de la deuda; multiplicar un valor negativo por una cantidad de veces positiva mantiene el sentido negativo."},{"label":"D","text":"El resultado siempre es negativo.","isCorrect":true,"rationale":"La multiplicación de factores con signos distintos resulta en un producto negativo, representando una acumulación de deuda o pérdida."}]},{"question":"En una operación combinada como $+15.000 + (5 \\times -2.000) - 3.000$, ¿qué parte del ejercicio debe resolverse en primer lugar según la prioridad de operaciones?","hint":"Considera el orden estándar de las operaciones: paréntesis, potencias, multiplicación/división y finalmente suma/resta.","options":[{"label":"A","text":"La multiplicación: $(5 \\times -2.000)$.","isCorrect":true,"rationale":"En la jerarquía de operaciones matemáticas, las multiplicaciones y divisiones deben resolverse antes que las sumas y restas."},{"label":"B","text":"Se resuelve estrictamente de izquierda a derecha sin importar la operación.","isCorrect":false,"rationale":"Seguir el orden de lectura ignorando la jerarquía (como multiplicar antes de sumar) conduce a resultados financieros erróneos."},{"label":"C","text":"La resta final: $- 3.000$.","isCorrect":false,"rationale":"Resolver las restas al principio suele ser incorrecto a menos que estén dentro de un paréntesis prioritario."},{"label":"D","text":"La primera suma: $15.000 + 5$.","isCorrect":false,"rationale":"Agrupar un número independiente con un factor de una multiplicación antes de realizar esta última rompe la prioridad de las operaciones."}]},{"question":"Si un jugador de videojuegos comete $12$ errores y cada error le resta $5$ puntos, ¿cuál es la operación correcta con números enteros para calcular su puntaje total perdido?","hint":"Busca la operación que represente una 'deuda repetida' o pérdida acumulada.","options":[{"label":"A","text":"$12 + (-5)$","isCorrect":false,"rationale":"Sumar los valores solo indicaría un error y una resta simple, no la repetición de la pérdida por cada uno de los doce errores."},{"label":"B","text":"$12 \\times (-5)$","isCorrect":true,"rationale":"La cantidad de eventos (errores) se multiplica por el valor negativo que representa la pérdida de puntos por cada uno."},{"label":"C","text":"$-12 \\times (-5)$","isCorrect":false,"rationale":"Multiplicar dos números negativos resultaría en un puntaje positivo, lo cual no tiene sentido en un contexto de pérdida de puntos."},{"label":"D","text":"$12 \\div (-5)$","isCorrect":false,"rationale":"La división se usa para repartir una deuda, no para calcular el acumulado de puntos perdidos por múltiples fallos."}]},{"question":"Calcula el saldo final de una cuenta que inicia con $+12.000$, tiene una deuda repetida de $3 \\times (-4.000)$ y recibe un depósito de $+2.000$.","hint":"Primero determina el valor total de la deuda multiplicando y luego suma los valores positivos.","options":[{"label":"A","text":"$+2.000$","isCorrect":true,"rationale":"Al resolver $3 \\times -4.000 = -12.000$, el saldo inicial se anula ($12.000 - 12.000 = 0$), quedando solo el depósito final de $2.000$."},{"label":"B","text":"$-2.000$","isCorrect":false,"rationale":"Este valor implicaría que los gastos superaron a los ingresos, lo cual no ocurre ya que los positivos y el gasto principal se equilibran antes del depósito."},{"label":"C","text":"$0$","isCorrect":false,"rationale":"Aunque la deuda y el saldo inicial se cancelan, este resultado olvida incluir el depósito final de $+2.000$."},{"label":"D","text":"$+26.000$","isCorrect":false,"rationale":"Este resultado asume erróneamente que la multiplicación de $3 \\times (-4.000)$ es positiva, sumando deudas en lugar de restarlas."}]},{"question":"Una empresa tiene una pérdida total de $-\\$ 24.000$ distribuida en $6$ meses de forma igualitaria. ¿Cómo se expresa matemáticamente el gasto mensual?","hint":"Recuerda que repartir una cantidad en partes iguales requiere una división.","options":[{"label":"A","text":"$-24.000 \\times 6 = -144.000$","isCorrect":false,"rationale":"La multiplicación aumentaría la deuda total en lugar de repartirla entre los meses del periodo."},{"label":"B","text":"$-24.000 \\div 6 = -4.000$","isCorrect":true,"rationale":"Dividir una deuda (negativo) por un número de meses (positivo) resulta en una deuda mensual representada por un número negativo."},{"label":"C","text":"$-24.000 \\div 6 = +4.000$","isCorrect":false,"rationale":"Un resultado positivo indicaría una ganancia mensual, lo cual contradice la situación de pérdida total inicial."},{"label":"D","text":"$24.000 - 6 = 23.994$","isCorrect":false,"rationale":"Restar la cantidad de meses del monto total no es el procedimiento correcto para distribuir o promediar una cifra en el tiempo."}]},{"question":"Resuelve el siguiente desafío de nivel experto: $+30.000 + (4 \\times -5.000) + (2 \\times 2.500) - 10.000$.","hint":"Resuelve las dos multiplicaciones primero, una te dará un valor negativo y la otra uno positivo.","options":[{"label":"A","text":"$-5.000$","isCorrect":false,"rationale":"Obtener un valor negativo sugeriría que los gastos fueron mayores a los ingresos disponibles, lo cual no coincide con las cifras dadas."},{"label":"B","text":"$+5.000$","isCorrect":true,"rationale":"Los cálculos son: $4 \\times -5.000 = -20.000$ y $2 \\times 2.500 = 5.000$. Al sumar: $30.000 - 20.000 + 5.000 - 10.000 = 5.000$."},{"label":"C","text":"$+15.000$","isCorrect":false,"rationale":"Este error puede surgir al no restar el gasto final de $10.000$ o al calcular incorrectamente una de las multiplicaciones."},{"label":"D","text":"$+25.000$","isCorrect":false,"rationale":"Resultado probable si se ignora el signo negativo en la deuda de $(4 \\times -5.000)$ y se suma como si fuera un ingreso."}]},{"question":"¿Cuál es la interpretación correcta si al validar un problema financiero el resultado final es $+\\$ 6.000$?","hint":"Piensa en lo que simboliza el signo '$+$' en un cajero automático o una aplicación bancaria.","options":[{"label":"A","text":"Se obtuvo una ganancia o saldo a favor.","isCorrect":true,"rationale":"En el sistema de números enteros aplicado a finanzas, los resultados positivos representan excedentes o dinero disponible."},{"label":"B","text":"La cuenta quedó exactamente en cero.","isCorrect":false,"rationale":"Un saldo de cero se conoce como neutro, mientras que $+6.000$ indica claramente un valor por encima del punto de equilibrio."},{"label":"C","text":"Se gastó más de lo que se ingresó.","isCorrect":false,"rationale":"Gastar más de lo ingresado resultaría en un número negativo (déficit), no en uno positivo."},{"label":"D","text":"Existe una deuda pendiente de cobrar.","isCorrect":false,"rationale":"Las deudas se representan con signos negativos; un signo positivo indica posesión de fondos, no obligación de pago."}]},{"question":"Al analizar el error de un compañero, observas que escribió: $(-6.000) \\div 3 = +2.000$. ¿Qué concepto falló en su validación?","hint":"Observa los signos de los números que se están dividiendo y compáralos con el signo del resultado.","options":[{"label":"A","text":"La interpretación de números reales.","isCorrect":false,"rationale":"Aunque es un problema de enteros, el fallo específico radica en la aplicación de las leyes algebraicas de los signos."},{"label":"B","text":"La prioridad de las operaciones.","isCorrect":false,"rationale":"En este caso solo hay una operación, por lo que no hay conflicto de jerarquía u orden de resolución."},{"label":"C","text":"La regla de signos para la división de enteros.","isCorrect":true,"rationale":"Al dividir un número negativo por uno positivo, el cociente debe ser obligatoriamente negativo."},{"label":"D","text":"El cálculo aritmético de la división.","isCorrect":false,"rationale":"El valor numérico ($2.000$) es correcto ($6.000 \\div 3 = 2.000$), por lo que el error no es de cálculo sino de signo."}]},{"question":"En el 'Nivel 5 - Desafío Combinado', ¿por qué es útil separar los ingresos de los gastos antes de dar el resultado final?","hint":"Es una estrategia visual mencionada en la Diapositiva 14 para ordenar el 'Dashboard'.","options":[{"label":"A","text":"Para que el resultado siempre sea positivo.","isCorrect":false,"rationale":"Organizar los datos no cambia el valor del resultado final; si los gastos son mayores, el resultado seguirá siendo negativo."},{"label":"B","text":"Porque es obligatorio por ley matemática.","isCorrect":false,"rationale":"No es obligatorio, es una estrategia sugerida para mejorar la precisión, pero se puede resolver de otras formas válidas."},{"label":"C","text":"Para facilitar la organización lógica y evitar errores de signo.","isCorrect":true,"rationale":"Agrupar positivos por un lado y negativos por otro permite realizar una única resta final, reduciendo la probabilidad de errores procedimentales."},{"label":"D","text":"Para evitar tener que multiplicar.","isCorrect":false,"rationale":"Las multiplicaciones deben realizarse primero de todos modos; la organización de ingresos y gastos ocurre después de resolver los productos."}]},{"question":"Si una 'Misión Final' comienza con un saldo de $+\\$ 20.000$ y se ejecutan $6$ movimientos de $-\\$ 2.500$, ¿cuánto dinero queda disponible antes de considerar cualquier otro ingreso o gasto extra?","hint":"Primero multiplica la cantidad de movimientos por su valor negativo y súmalo al saldo inicial.","options":[{"label":"A","text":"$+\\$ 5.000$","isCorrect":true,"rationale":"El gasto total es $6 \\times 2.500 = 15.000$. Al restar esto del saldo inicial ($20.000 - 15.000$), quedan $5.000$."},{"label":"B","text":"$+\\$ 17.500$","isCorrect":false,"rationale":"Este error ocurre si solo se resta un movimiento de $2.500$ en lugar de los seis que indica el problema."},{"label":"C","text":"$+\\$ 15.000$","isCorrect":false,"rationale":"Este valor representa el total gastado en los movimientos, no el saldo que queda en la cuenta después de realizarlos."},{"label":"D","text":"$-\\$ 5.000$","isCorrect":false,"rationale":"Este resultado sugeriría que el saldo inicial no fue suficiente para cubrir los movimientos, lo cual es falso ya que $20.000 > 15.000$."}]}];
-const tr = {"correct":"Correct!","incorrect":"Incorrect","next":"Next Question →","seeResults":"See Results","complete":"Quiz Complete!","scoreText":"You got {correct} out of {total} correct","tryAgain":"Try Again","rightAnswer":"Right answer","notQuite":"Not quite"};
-let currentQ = 0, correctCount = 0, answered = false;
 
-function init() {
-  document.querySelectorAll('.question').forEach((q, i) => q.classList.toggle('active', i === 0));
-  updateProgress();
-  document.querySelectorAll('.option').forEach(opt => opt.addEventListener('click', () => selectOption(opt)));
-  document.querySelectorAll('.next-btn').forEach(btn => btn.addEventListener('click', nextQuestion));
-}
+    <header>
+        <h1 id="main-title">📚 Material de Estudio</h1>
+        <p>Colegio Ignacio Carrera Pinto</p>
+    </header>
 
-function selectOption(opt) {
-  if (answered) return;
-  answered = true;
-  const q = opt.closest('.question');
-  const options = q.querySelectorAll('.option');
-  const nextBtn = q.querySelector('.next-btn');
-  const isCorrect = opt.dataset.correct === 'true';
-  
-  // Mark all options as disabled
-  options.forEach(o => o.classList.add('disabled'));
-  
-  // Style selected option
-  opt.classList.add('selected', isCorrect ? 'correct' : 'incorrect');
-  
-  // Show correct answer if wrong
-  if (!isCorrect) {
-    const correctOpt = [...options].find(o => o.dataset.correct === 'true');
-    if (correctOpt) correctOpt.classList.add('show-correct');
-  }
-  
-  if (isCorrect) correctCount++;
-  
-  // Show feedback for ALL options that have rationale
-  options.forEach(o => {
-    const wrapper = o.closest('.option-wrapper');
-    const feedback = wrapper.querySelector('.option-feedback');
-    const rationale = o.dataset.rationale;
-    const isThisCorrect = o.dataset.correct === 'true';
-    
-    if (rationale && rationale.trim()) {
-      feedback.classList.remove('hidden');
-      feedback.classList.add(isThisCorrect ? 'correct-feedback' : 'incorrect-feedback');
-      
-      const statusEl = feedback.querySelector('.feedback-status');
-      statusEl.className = 'feedback-status ' + (isThisCorrect ? 'correct' : 'incorrect');
-      statusEl.innerHTML = isThisCorrect 
-        ? '✓ ' + tr.rightAnswer
-        : '✗ ' + tr.notQuite;
-    }
-  });
-  
-  nextBtn.classList.remove('hidden');
-  if (currentQ === quizData.length - 1) nextBtn.textContent = tr.seeResults;
-}
+    <main>
+        <div class="container">
+            <div id="home-menu" class="menu-cursos">
+                <button class="btn-curso" onclick="mostrarCurso('5to básico')">📖 5to Básico</button>
+                <button class="btn-curso" onclick="mostrarCurso('6to básico')">📐 6to Básico</button>
+                <button class="btn-curso" onclick="mostrarCurso('7mo básico')">➗ 7mo Básico</button>
+                <button class="btn-curso" onclick="mostrarCurso('8vo básico')">🧪 8vo Básico</button>
+            </div>
 
-function nextQuestion() {
-  answered = false;
-  currentQ++;
-  if (currentQ >= quizData.length) { showResults(); return; }
-  document.querySelectorAll('.question').forEach((q, i) => q.classList.toggle('active', i === currentQ));
-  updateProgress();
-}
+            <div id="course-section" class="seccion-material">
+                <h2 id="course-title">Nombre del Curso</h2>
+                <ul id="quiz-list" class="lista-cuestionarios">
+                    </ul>
+                <button class="btn-volver" onclick="irAInicio()">⬅ Volver al inicio</button>
+            </div>
+        </div>
+    </main>
 
-function updateProgress() {
-  document.querySelector('.progress-fill').style.width = (currentQ / quizData.length * 100) + '%';
-}
+    <footer>
+        <div class="footer-line">
+            Profesor: <span class="profesor-nombre" id="nombre-prof">Stik Gatica Olivares</span>
+        </div>
+        <div class="footer-line">Colegio Ignacio Carrera Pinto</div>
+        <div class="footer-line">
+            Contacto: <a id="correo-prof" href="mailto:tu-correo@ejemplo.com" style="color: inherit;">tu-correo@ejemplo.com</a>
+        </div>
+        <div class="footer-line">
+            &copy; <span id="year"></span> - Todos los derechos reservados.
+        </div>
+    </footer>
 
-function showResults() {
-  document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
-  document.getElementById('results').classList.add('active');
-  const pct = Math.round((correctCount / quizData.length) * 100);
-  document.getElementById('score').textContent = pct + '%';
-  document.getElementById('score-text').textContent = tr.scoreText.replace('{correct}', correctCount).replace('{total}', quizData.length);
-  document.querySelector('.progress-fill').style.width = '100%';
-}
+    <script>
+        /* --- CONFIGURACIÓN DE DATOS (Fácil de editar) --- */
+        const infoProfesor = {
+            nombre: "Stik Gatica Olivares",
+            correo: "stik.gatica@ejemplo.com"
+        };
 
-function restart() {
-  currentQ = 0; correctCount = 0; answered = false;
-  document.getElementById('results').classList.remove('active');
-  document.querySelectorAll('.question').forEach((q, i) => {
-    q.classList.toggle('active', i === 0);
-    q.querySelectorAll('.option').forEach(o => o.classList.remove('selected', 'correct', 'incorrect', 'disabled', 'show-correct'));
-    q.querySelectorAll('.option-feedback').forEach(f => {
-      f.classList.add('hidden');
-      f.classList.remove('correct-feedback', 'incorrect-feedback');
-    });
-    const btn = q.querySelector('.next-btn');
-    btn.classList.add('hidden');
-    btn.textContent = tr.next;
-  });
-  updateProgress();
-}
+        const materiales = {
+            "5to básico": [
+                { nombre: "Cuestionario 1: Operaciones Básicas", url: "#" },
+                { nombre: "Cuestionario 2: Geometría Inicial", url: "#" },
+                { nombre: "Cuestionario 3: Fracciones y Decimales", url: "#" },
+                { nombre: "Cuestionario 4: Ciencias Naturales - El Cuerpo", url: "#" },
+                { nombre: "Cuestionario 5: Comprensión Lectora", url: "#" }
+            ],
+            "6to básico": [
+                { nombre: "Cuestionario 1: Múltiplos y Factores", url: "#" },
+                { nombre: "Cuestionario 2: Razones y Proporciones", url: "#" },
+                { nombre: "Cuestionario 3: Capas de la Tierra", url: "#" },
+                { nombre: "Cuestionario 4: Historia de Chile", url: "#" },
+                { nombre: "Cuestionario 5: Ortografía y Gramática", url: "#" }
+            ],
+            "7mo básico": [
+                { nombre: "Cuestionario 1: Números Enteros (Z)", url: "#" },
+                { nombre: "Cuestionario 2: Álgebra Básica", url: "#" },
+                { nombre: "Cuestionario 3: La Célula y sus Partes", url: "#" },
+                { nombre: "Cuestionario 4: Civilizaciones Antiguas", url: "#" },
+                { nombre: "Cuestionario 5: Análisis Literario", url: "#" }
+            ],
+            "8vo básico": [
+                { nombre: "Cuestionario 1: Raíces y Potencias", url: "#" },
+                { nombre: "Cuestionario 2: Ecuaciones e Inecuaciones", url: "#" },
+                { nombre: "Cuestionario 3: Física - Electricidad", url: "#" },
+                { nombre: "Cuestionario 4: Formación Ciudadana", url: "#" },
+                { nombre: "Cuestionario 5: Texto Argumentativo", url: "#" }
+            ]
+        };
 
-init();
-</script>
+        /* --- LÓGICA DE FUNCIONAMIENTO --- */
+
+        // Al cargar la página, configurar footer y año
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('year').textContent = new Date().getFullYear();
+            document.getElementById('nombre-prof').textContent = infoProfesor.nombre;
+            const correoElement = document.getElementById('correo-prof');
+            correoElement.textContent = infoProfesor.correo;
+            correoElement.href = `mailto:${infoProfesor.correo}`;
+        });
+
+        function mostrarCurso(curso) {
+            // Ocultar menú principal y mostrar sección de materiales
+            document.getElementById('home-menu').style.display = 'none';
+            document.getElementById('course-section').style.display = 'block';
+            
+            // Actualizar título
+            document.getElementById('course-title').textContent = "Materiales para " + curso;
+            
+            // Limpiar y cargar lista de cuestionarios
+            const lista = document.getElementById('quiz-list');
+            lista.innerHTML = "";
+            
+            materiales[curso].forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="${item.url}" target="_blank">📝 ${item.nombre}</a>`;
+                lista.appendChild(li);
+            });
+
+            // Hacer scroll hacia arriba para mejor UX
+            window.scrollTo(0, 0);
+        }
+
+        function irAInicio() {
+            // Volver a la vista principal
+            document.getElementById('course-section').style.display = 'none';
+            document.getElementById('home-menu').style.display = 'flex';
+            document.getElementById('main-title').textContent = "📚 Material de Estudio";
+        }
+    </script>
 </body>
 </html>
