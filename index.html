@@ -152,11 +152,34 @@
             header h1 { font-size: 1.5rem; }
             .btn-curso { padding: 1.2rem; font-size: 1rem; }
         }
+        /* --- LOGO ESQUINA SUPERIOR --- */
+        .logo-esquina {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            width: 70px;
+            height: auto;
+        }
+
+        /* Ajuste para que header permita posición absoluta */
+        header {
+            position: relative;
+        }
+
+        /* Responsive (celulares) */
+        @media (max-width: 480px) {
+            .logo-esquina {
+                width: 45px;
+                top: 8px;
+                right: 10px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <header>
+        <img src="insignia.png" alt="Insignia Colegio" class="logo-esquina">
         <h1 id="main-title">📚 Material complementario de estudio</h1>
         <p>Con cariño ❤️</p>
     </header>
