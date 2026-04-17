@@ -3,175 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Material complementario de estudio - Colegio Ignacio Carrera Pinto</title>
+    <meta name="description" content="Material complementario de estudio de matemática para 5° a 8° básico - Colegio Ignacio Carrera Pinto.">
+    <title>Material complementario de estudio · Colegio Ignacio Carrera Pinto</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* --- VARIABLES PARA EDICIÓN RÁPIDA --- */
+        /* ============ TOKENS DE DISEÑO ============ */
         :root {
-            --color-primario: #2c3e50;    /* Azul oscuro profesional */
-            --color-secundario: #3498db;  /* Azul educativo */
-            --color-acento: #e67e22;      /* Naranja para botones y realces */
-            --color-fondo: #f4f7f6;      /* Gris muy claro */
-            --fuente-principal: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Paleta base */
+            --bg: #fff8ef;
+            --bg-soft: #fff3e0;
+            --ink: #1f2a44;
+            --ink-soft: #4a5577;
+            --muted: #8892b0;
+            --line: #ecd9b8;
+            --white: #ffffff;
+
+            /* Colores por curso */
+            --c-5to: #ff6b6b;     /* Coral */
+            --c-5to-soft: #ffe3e3;
+            --c-6to: #4ecdc4;     /* Turquesa */
+            --c-6to-soft: #d8f5f2;
+            --c-7mo: #ffa94d;     /* Naranja */
+            --c-7mo-soft: #ffe8d1;
+            --c-8vo: #845ef7;     /* Violeta */
+            --c-8vo-soft: #e7dcff;
+
+            --shadow-sm: 0 4px 0 rgba(31, 42, 68, 0.08);
+            --shadow-md: 0 10px 0 rgba(31, 42, 68, 0.10);
+            --shadow-lg: 0 18px 40px -15px rgba(31, 42, 68, 0.35);
+
+            --radius-md: 18px;
+            --radius-lg: 28px;
+
+            --font-display: 'Fredoka', system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
+            --font-body: 'Nunito', system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
         }
 
-        /* --- ESTILOS GENERALES --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        /* ============ RESET ============ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: var(--fuente-principal);
-            background-color: var(--color-fondo);
-            color: var(--color-primario);
+            font-family: var(--font-body);
+            color: var(--ink);
+            background: var(--bg);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Asegura que el footer se mantenga abajo */
+            line-height: 1.55;
+            overflow-x: hidden;
+            position: relative;
         }
 
+        /* Formas decorativas de fondo */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.35;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before {
+            width: 380px; height: 380px;
+            background: var(--c-6to);
+            top: -120px; left: -120px;
+        }
+        body::after {
+            width: 420px; height: 420px;
+            background: var(--c-8vo);
+            bottom: -160px; right: -140px;
+        }
+
+        /* ============ HEADER ============ */
         header {
-            background-color: var(--color-primario);
-            color: white;
-            padding: 2rem 1rem;
+            position: relative;
+            z-index: 2;
+            padding: 2.5rem 1.25rem 2rem;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
+        .logo-esquina {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            width: 72px;
+            height: auto;
+            background: var(--white);
+            padding: 6px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-pill {
+            display: inline-block;
+            background: var(--white);
+            color: var(--c-7mo);
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            margin-bottom: 0.9rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            box-shadow: var(--shadow-sm);
+        }
+
+        header h1 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(1.7rem, 4.5vw, 2.6rem);
+            line-height: 1.15;
+            color: var(--ink);
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        header h1 .highlight {
+            background: linear-gradient(180deg, transparent 60%, var(--c-7mo-soft) 60%);
+            padding: 0 6px;
+        }
+
+        header p {
+            margin-top: 0.7rem;
+            color: var(--ink-soft);
+            font-size: 1.05rem;
+        }
+        header p .heart { color: var(--c-5to); }
+
+        /* ============ MAIN ============ */
         main {
-            flex: 1; /* Empuja el footer hacia abajo */
+            flex: 1;
+            position: relative;
+            z-index: 2;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 2rem;
+            padding: 1rem 1.25rem 3rem;
         }
 
         .container {
             width: 100%;
-            max-width: 600px;
-            text-align: center;
+            max-width: 760px;
         }
 
-        /* --- ESTILOS DE BOTONES Y MENÚ PRINCIPAL --- */
+        /* ============ MENÚ DE CURSOS ============ */
         .menu-cursos {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.1rem;
         }
 
         .btn-curso {
-            background-color: white;
-            color: var(--color-primario);
-            border: 2px solid var(--color-secundario);
-            padding: 1.5rem;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 12px;
+            --c: var(--c-5to);
+            --c-soft: var(--c-5to-soft);
+            position: relative;
+            background: var(--white);
+            color: var(--ink);
+            border: none;
+            padding: 1.6rem 1.2rem 1.4rem;
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: var(--radius-lg);
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: block;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .btn-curso:hover {
-            background-color: var(--color-secundario);
-            color: white;
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-
-        /* --- SECCIONES DE MATERIAL (OCULTAS POR DEFECTO) --- */
-        .seccion-material {
-            display: none; /* Se activa con JS */
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             text-align: left;
-            animation: fadeIn 0.5s ease;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .btn-curso::before {
+            content: '';
+            position: absolute;
+            inset: auto -30px -30px auto;
+            width: 130px; height: 130px;
+            background: var(--c-soft);
+            border-radius: 50%;
+            z-index: -1;
+            transition: transform 0.4s ease;
+        }
+
+        .btn-curso:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+        .btn-curso:hover::before { transform: scale(1.4); }
+        .btn-curso:focus-visible { outline: 3px solid var(--c); outline-offset: 3px; }
+        .btn-curso:active { transform: translateY(-2px); }
+
+        .btn-curso .emoji {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 54px; height: 54px;
+            background: var(--c);
+            color: var(--white);
+            font-size: 1.7rem;
+            border-radius: 16px;
+            margin-bottom: 0.9rem;
+            box-shadow: 0 6px 0 color-mix(in srgb, var(--c) 70%, black);
+        }
+
+        .btn-curso .label-curso {
+            display: block;
+            font-size: 1.15rem;
+            line-height: 1.2;
+        }
+        .btn-curso .sublabel {
+            display: block;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .btn-curso[data-curso="5to básico"] { --c: var(--c-5to); --c-soft: var(--c-5to-soft); }
+        .btn-curso[data-curso="6to básico"] { --c: var(--c-6to); --c-soft: var(--c-6to-soft); }
+        .btn-curso[data-curso="7mo básico"] { --c: var(--c-7mo); --c-soft: var(--c-7mo-soft); }
+        .btn-curso[data-curso="8vo básico"] { --c: var(--c-8vo); --c-soft: var(--c-8vo-soft); }
+
+        /* ============ SECCIÓN DE MATERIAL ============ */
+        .seccion-material {
+            display: none;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            text-align: left;
+            animation: fadeIn 0.45s ease;
+            border-top: 8px solid var(--c-curso, var(--c-5to));
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(14px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .course-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 1.4rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 2px dashed var(--line);
+        }
+        .course-header .badge-emoji {
+            width: 56px; height: 56px;
+            background: var(--c-curso, var(--c-5to));
+            color: var(--white);
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            box-shadow: 0 5px 0 color-mix(in srgb, var(--c-curso, var(--c-5to)) 70%, black);
+            flex-shrink: 0;
+        }
+        .course-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            color: var(--ink);
+            line-height: 1.2;
+        }
+        .course-header h2 small {
+            display: block;
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 2px;
         }
 
         .lista-cuestionarios {
             list-style: none;
-            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
         }
 
-        .lista-cuestionarios li {
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px dashed #ddd;
-        }
-
-        .lista-cuestionarios a {
-            color: var(--color-secundario);
-            text-decoration: none;
-            font-weight: 500;
+        .lista-cuestionarios li a {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            padding: 0.95rem 1rem;
+            background: var(--bg-soft);
+            border-radius: 14px;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.98rem;
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+            border-left: 4px solid var(--c-curso, var(--c-5to));
         }
-
-        .lista-cuestionarios a:hover {
-            color: var(--color-acento);
-            text-decoration: underline;
+        .lista-cuestionarios li a:hover {
+            background: var(--c-curso, var(--c-5to));
+            color: var(--white);
+            transform: translateX(6px);
         }
+        .lista-cuestionarios li a .item-icon {
+            width: 36px; height: 36px;
+            background: var(--white);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+        .lista-cuestionarios li a:hover .item-icon { background: rgba(255,255,255,0.25); }
+        .lista-cuestionarios li a .arrow {
+            margin-left: auto;
+            opacity: 0;
+            transform: translateX(-6px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            font-weight: 800;
+        }
+        .lista-cuestionarios li a:hover .arrow { opacity: 1; transform: translateX(0); }
 
         .btn-volver {
-            display: inline-block;
-            margin-top: 2rem;
-            padding: 0.8rem 1.5rem;
-            background-color: var(--color-primario);
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 1.8rem;
+            padding: 0.8rem 1.4rem;
+            background: var(--ink);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 5px 0 #0d1426;
+            transition: transform 0.2s ease;
         }
+        .btn-volver:hover { transform: translateY(-2px); }
+        .btn-volver:active { transform: translateY(1px); box-shadow: 0 2px 0 #0d1426; }
 
-        /* --- FOOTER --- */
+        /* ============ FOOTER ============ */
         footer {
-            background-color: #f8f9fa;
-            border-top: 1px solid #dee2e6;
-            padding: 1.5rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        .footer-line { margin: 5px 0; }
-        .profesor-nombre { font-weight: bold; color: var(--color-primario); }
-
-        /* --- RESPONSIVO --- */
-        @media (max-width: 480px) {
-            header h1 { font-size: 1.5rem; }
-            .btn-curso { padding: 1.2rem; font-size: 1rem; }
-        }
-        /* --- LOGO ESQUINA SUPERIOR --- */
-        .logo-esquina {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            width: 70px;
-            height: auto;
-        }
-
-        /* Ajuste para que header permita posición absoluta */
-        header {
             position: relative;
+            z-index: 2;
+            background: var(--white);
+            border-top: 4px dotted var(--line);
+            padding: 1.8rem 1.25rem;
+            text-align: center;
+            font-size: 0.88rem;
+            color: var(--ink-soft);
+        }
+        .footer-line { margin: 4px 0; max-width: 720px; margin-left: auto; margin-right: auto; }
+        .profesor-nombre {
+            font-family: var(--font-display);
+            font-weight: 600;
+            color: var(--c-8vo);
+        }
+        footer a { color: var(--c-6to); font-weight: 700; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        .disclaimer {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.8rem;
+            font-style: italic;
+        }
+        .copy { margin-top: 0.6rem; font-size: 0.8rem; color: var(--muted); }
+
+        /* ============ RESPONSIVO ============ */
+        @media (max-width: 540px) {
+            .menu-cursos { grid-template-columns: 1fr; gap: 0.9rem; }
+            .logo-esquina { width: 50px; top: 12px; right: 12px; }
+            header { padding-top: 2rem; }
+            .seccion-material { padding: 1.4rem; }
+            .course-header h2 { font-size: 1.15rem; }
+            .lista-cuestionarios li a { font-size: 0.92rem; padding: 0.85rem; }
         }
 
-        /* Responsive (celulares) */
-        @media (max-width: 480px) {
-            .logo-esquina {
-                width: 45px;
-                top: 8px;
-                right: 10px;
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
@@ -179,24 +396,46 @@
 <body>
 
     <header>
-        <img src="insignia.png" alt="Insignia Colegio" class="logo-esquina">
-        <h1 id="main-title">📚 Material complementario de estudio</h1>
-        <p>Con cariño ❤️</p>
+        <img src="insignia.png" alt="Insignia Colegio Ignacio Carrera Pinto" class="logo-esquina" onerror="this.style.display='none'">
+        <span class="header-pill">📚 Recursos de matemática</span>
+        <h1 id="main-title">Material <span class="highlight">complementario</span> de estudio</h1>
+        <p>Hecho con <span class="heart">❤</span> para mis estudiantes</p>
     </header>
 
     <main>
         <div class="container">
             <div id="home-menu" class="menu-cursos">
-                <button class="btn-curso" onclick="mostrarCurso('5to básico')">📖 5to Básico</button>
-                <button class="btn-curso" onclick="mostrarCurso('6to básico')">📐 6to Básico</button>
-                <button class="btn-curso" onclick="mostrarCurso('7mo básico')">➗ 7mo Básico</button>
-                <button class="btn-curso" onclick="mostrarCurso('8vo básico')">🧪 8vo Básico</button>
+                <button class="btn-curso" data-curso="5to básico" onclick="mostrarCurso('5to básico')">
+                    <span class="emoji">📖</span>
+                    <span class="label-curso">5to Básico</span>
+                    <span class="sublabel">Grandes números · Mult.</span>
+                </button>
+                <button class="btn-curso" data-curso="6to básico" onclick="mostrarCurso('6to básico')">
+                    <span class="emoji">📐</span>
+                    <span class="label-curso">6to Básico</span>
+                    <span class="sublabel">Evaluaciones</span>
+                </button>
+                <button class="btn-curso" data-curso="7mo básico" onclick="mostrarCurso('7mo básico')">
+                    <span class="emoji">➗</span>
+                    <span class="label-curso">7mo Básico</span>
+                    <span class="sublabel">Enteros y fracciones</span>
+                </button>
+                <button class="btn-curso" data-curso="8vo básico" onclick="mostrarCurso('8vo básico')">
+                    <span class="emoji">🧪</span>
+                    <span class="label-curso">8vo Básico</span>
+                    <span class="sublabel">Enteros y racionales</span>
+                </button>
             </div>
 
             <div id="course-section" class="seccion-material">
-                <h2 id="course-title">Nombre del Curso</h2>
-                <ul id="quiz-list" class="lista-cuestionarios">
-                    </ul>
+                <div class="course-header">
+                    <span class="badge-emoji" id="course-emoji">📖</span>
+                    <h2 id="course-title">
+                        Materiales
+                        <small id="course-subtitle">Selecciona un recurso</small>
+                    </h2>
+                </div>
+                <ul id="quiz-list" class="lista-cuestionarios"></ul>
                 <button class="btn-volver" onclick="irAInicio()">⬅ Volver al inicio</button>
             </div>
         </div>
@@ -208,20 +447,28 @@
         </div>
         <div class="footer-line">Colegio Ignacio Carrera Pinto</div>
         <div class="footer-line">
-            Contacto: <a id="correo-prof" href="mailto:stik.gatica@edumargamarga.gob.cl" style="color: inherit;">stik.gatica@edumargamarga.gob.cl</a>
+            Contacto: <a id="correo-prof" href="mailto:stik.gatica@edumargamarga.gob.cl">stik.gatica@edumargamarga.gob.cl</a>
         </div>
-        <div class="footer-line">La información disponible en este sitio web es de carácter complementario y en ningún caso reemplaza la asistencia regular a clases ni las actividades pedagógicas presenciales del establecimiento.          
+        <div class="footer-line disclaimer">
+            La información disponible en este sitio web es de carácter complementario y en ningún caso reemplaza la asistencia regular a clases ni las actividades pedagógicas presenciales del establecimiento.
         </div>
-        <div class="footer-line">
-            &copy; <span id="year"></span> - Todos los derechos reservados.            
+        <div class="footer-line copy">
+            &copy; <span id="year"></span> · Todos los derechos reservados.
         </div>
     </footer>
 
     <script>
-        /* --- CONFIGURACIÓN DE DATOS (Fácil de editar) --- */
+        /* --- CONFIGURACIÓN DE DATOS --- */
         const infoProfesor = {
             nombre: "Stik Gatica Olivares",
             correo: "stik.gatica@edumargamarga.gob.cl"
+        };
+
+        const cursoMeta = {
+            "5to básico": { emoji: "📖", color: "var(--c-5to)" },
+            "6to básico": { emoji: "📐", color: "var(--c-6to)" },
+            "7mo básico": { emoji: "➗", color: "var(--c-7mo)" },
+            "8vo básico": { emoji: "🧪", color: "var(--c-8vo)" }
         };
 
         const materiales = {
@@ -255,9 +502,7 @@
             ]
         };
 
-        /* --- LÓGICA DE FUNCIONAMIENTO --- */
-
-        // Al cargar la página, configurar footer y año
+        /* --- LÓGICA --- */
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('year').textContent = new Date().getFullYear();
             document.getElementById('nombre-prof').textContent = infoProfesor.nombre;
@@ -266,33 +511,47 @@
             correoElement.href = `mailto:${infoProfesor.correo}`;
         });
 
+        function iconoPorNombre(nombre) {
+            const n = nombre.toLowerCase();
+            if (n.includes('cuestionario')) return '📝';
+            if (n.includes('presentación') || n.includes('presentacion') || n.includes('ppt')) return '🎞️';
+            if (n.includes('material')) return '📂';
+            return '📄';
+        }
+
         function mostrarCurso(curso) {
-            // Ocultar menú principal y mostrar sección de materiales
+            const meta = cursoMeta[curso];
             document.getElementById('home-menu').style.display = 'none';
-            document.getElementById('course-section').style.display = 'block';
-            
-            // Actualizar título
-            document.getElementById('course-title').textContent = "Materiales para " + curso;
-            
-            // Limpiar y cargar lista de cuestionarios
+            const seccion = document.getElementById('course-section');
+            seccion.style.display = 'block';
+            seccion.style.setProperty('--c-curso', meta.color);
+
+            document.getElementById('course-emoji').textContent = meta.emoji;
+            document.getElementById('course-title').childNodes[0].textContent = "Materiales para " + curso + " ";
+            document.getElementById('course-subtitle').textContent = `${materiales[curso].length} recursos disponibles`;
+
             const lista = document.getElementById('quiz-list');
             lista.innerHTML = "";
-            
+
             materiales[curso].forEach(item => {
                 const li = document.createElement('li');
-                li.innerHTML = `<a href="${item.url}" target="_blank">📝 ${item.nombre}</a>`;
+                const icono = iconoPorNombre(item.nombre);
+                li.innerHTML = `
+                    <a href="${item.url}" target="_blank" rel="noopener">
+                        <span class="item-icon">${icono}</span>
+                        <span>${item.nombre}</span>
+                        <span class="arrow">→</span>
+                    </a>`;
                 lista.appendChild(li);
             });
 
-            // Hacer scroll hacia arriba para mejor UX
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function irAInicio() {
-            // Volver a la vista principal
             document.getElementById('course-section').style.display = 'none';
-            document.getElementById('home-menu').style.display = 'flex';
-            document.getElementById('main-title').textContent = "📚 Material complementario de estudio";
+            document.getElementById('home-menu').style.display = 'grid';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
