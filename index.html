@@ -89,16 +89,22 @@
             text-align: center;
         }
 
-        .logo-esquina {
+        .logo-link {
             position: absolute;
             top: 18px;
             right: 22px;
+            display: inline-block;
+            border-radius: 16px;
+        }
+
+        .logo-esquina {
             width: 72px;
             height: auto;
             background: var(--white);
             padding: 6px;
             border-radius: 16px;
             box-shadow: var(--shadow-sm);
+            display: block;
         }
 
         .header-pill {
@@ -396,7 +402,10 @@
 <body>
 
     <header>
-        <img src="insignia.png" alt="Insignia Colegio Ignacio Carrera Pinto" class="logo-esquina" onerror="this.style.display='none'">
+        <a href="https://stikgatica.github.io/CICP/NotebookLM.pdf" class="logo-link" aria-label="Ir a taller">
+            <img src="insignia.png" alt="Insignia Colegio Ignacio Carrera Pinto" class="logo-esquina" onerror="this.style.display='none'">
+        </a>
+
         <span class="header-pill">📚 Recursos de matemática</span>
         <h1 id="main-title">Material <span class="highlight">complementario</span> de estudio</h1>
         <p>Hecho con <span class="heart">❤</span> para mis estudiantes</p>
