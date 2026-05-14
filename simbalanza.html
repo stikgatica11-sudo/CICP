@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador de Balanza: Ecuaciones e Inecuaciones</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --ink:#24313f;
+      --muted:#597284;
+      --primary:#5b7cfa;
+      --primary-dark:#3f5ee7;
+      --left:#ffae38;
+      --left-dark:#d68618;
+      --right:#62b765;
+      --right-dark:#419448;
+      --x:#58a9f2;
+      --unit:#ffd34f;
+      --neg:#ff8b68;
+      --danger:#ef5350;
+      --ok:#2eaf6f;
+      --shadow:0 18px 45px rgba(34,48,74,.15);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Arial,Helvetica,sans-serif;
+      background:radial-gradient(circle at top,#e8ecff 0%,var(--bg) 45%,#eef7f1 100%);
+      color:var(--ink);
+    }
+    .app{width:min(1150px,96vw);margin:0 auto;padding:16px 0 26px}
+    header{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:12px}
+    h1{margin:0;font-size:clamp(1.35rem,2.3vw,2.05rem);letter-spacing:-.03em}
+    .hint{margin:8px 0 0;font-size:.88rem;line-height:1.25;color:var(--muted)}
+    .language-box{margin-top:14px;padding:12px;border-radius:18px;background:#f7fafc;border:2px solid #e2eaf3}
+    .language-box h3{margin:0 0 8px;font-size:.98rem;color:var(--ink)}
+    .language-box .mini-label{display:block;margin-top:8px;font-size:.78rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+    .language-box .algebra-text{font-size:1.22rem;font-weight:900;color:var(--primary-dark);word-break:break-word}
+    .language-box .verbal-text{font-size:.94rem;line-height:1.25;font-weight:800;color:#34495e}
+    .mode-card,.equation-box,.panel,.balance-card,.bottom-controls{background:var(--card);box-shadow:var(--shadow)}
+    .mode-card{border-radius:18px;padding:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .mode-card label{font-size:.9rem;color:var(--muted);font-weight:800}
+    select,button,input{font:inherit}
+    select,input{border:2px solid #d9e1ff;border-radius:12px;padding:8px 12px;background:#fff;color:var(--ink);font-weight:800}
+    .equation-box{border-radius:24px;padding:14px 18px;margin-bottom:14px;text-align:center;border:3px solid rgba(91,124,250,.15)}
+    .equation-label{color:var(--muted);font-size:.9rem;font-weight:800;margin-bottom:4px}
+    .equation{font-size:clamp(1.8rem,4vw,3.15rem);line-height:1.08;font-weight:900;letter-spacing:-.04em}
+    .equation .leftTerm{color:#de7d00}.equation .rightTerm{color:#2e7d32}.equation .symbol{color:var(--primary-dark);margin:0 12px}
+    .result-line{margin-top:7px;font-size:1rem;color:var(--muted);font-weight:900;letter-spacing:0}
+    .main-grid{display:grid;grid-template-columns:220px 1fr 220px;gap:14px;align-items:stretch}
+    .panel{border-radius:24px;padding:14px}.panel h2{margin:0 0 10px;font-size:1.05rem}.tool-list,.remove-buttons{display:grid;gap:10px}
+    .draggable,.remove-buttons button,.bottom-controls button{
+      border:0;border-radius:15px;padding:11px 12px;font-weight:900;cursor:pointer;transition:transform .12s ease,filter .12s ease,background .12s ease;
+    }
+    .draggable{cursor:grab;user-select:none;touch-action:none;color:#1f2a44;box-shadow:0 10px 22px rgba(40,55,90,.18);display:flex;justify-content:center;align-items:center;min-height:54px;font-size:1.18rem}
+    .draggable:active{cursor:grabbing;transform:scale(1.03)}
+    .x-block{background:linear-gradient(145deg,#90caf9,var(--x))}.unit-block{background:linear-gradient(145deg,#ffe082,var(--unit))}.neg-unit-block{background:linear-gradient(145deg,#ffb39d,var(--neg));color:#3b1a10}
+    .remove-buttons button,.bottom-controls button{color:#fff;background:var(--primary);box-shadow:0 8px 18px rgba(91,124,250,.25)}
+    .remove-buttons button:hover,.bottom-controls button:hover{transform:translateY(-1px);filter:brightness(.98)}
+    .remove-buttons button.danger,.bottom-controls button.danger{background:var(--danger);box-shadow:0 8px 18px rgba(239,83,80,.24)}
+    .bottom-controls button.equalize{background:linear-gradient(135deg,#128a55,#34c77d);box-shadow:0 10px 24px rgba(46,175,111,.32);font-size:1.05rem}
+    .balance-card{border-radius:28px;padding:14px;min-height:520px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative;background:rgba(255,255,255,.75)}
+    .balance-area{position:relative;flex:1;min-height:390px;display:flex;align-items:end;justify-content:center;padding-bottom:25px}
+    .balance{width:min(700px,100%);height:360px;position:relative}
+    .stand{position:absolute;left:50%;bottom:8px;width:36px;height:220px;transform:translateX(-50%);background:linear-gradient(90deg,#34495e,#78909c,#34495e);border-radius:20px 20px 8px 8px;z-index:0}
+    .base{position:absolute;left:50%;bottom:0;width:230px;height:34px;transform:translateX(-50%);background:linear-gradient(90deg,#263238,#607d8b,#263238);border-radius:22px 22px 8px 8px;box-shadow:0 10px 16px rgba(0,0,0,.22)}
+    .pivot{position:absolute;left:50%;top:180px;width:72px;height:72px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#fff 0 16%,#5b7cfa 17% 45%,#34495e 46% 100%);z-index:3;box-shadow:0 12px 18px rgba(0,0,0,.22)}
+    .beam-wrap{position:absolute;left:50%;top:94px;width:82%;height:230px;transform:translateX(-50%) rotate(var(--tilt,0deg));transform-origin:50% 50%;transition:transform .35s ease;z-index:2}
+    .beam{position:absolute;top:95px;left:5%;width:90%;height:16px;background:linear-gradient(90deg,#3c4a61,#65758f,#3c4a61);border-radius:999px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2)}
+    .chain{position:absolute;width:4px;height:58px;background:repeating-linear-gradient(to bottom,#546e7a 0 8px,#78909c 8px 16px);top:111px;transform-origin:top center;border-radius:999px;z-index:1}
+    .chain.left-c1{left:8%}.chain.left-c2{left:31%}.chain.right-c1{right:8%}.chain.right-c2{right:31%}
+    .pan{position:absolute;top:166px;width:28%;min-width:130px;height:112px;border-radius:0 0 60px 60px;border:8px solid #546e7a;border-top:0;background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(232,240,247,.94));box-shadow:0 14px 20px rgba(40,60,80,.22);display:flex;align-items:end;justify-content:center;padding:8px 8px 10px;overflow:visible}
+    .pan::before{content:"";position:absolute;top:-9px;left:-14px;right:-14px;height:16px;border-radius:999px;background:linear-gradient(90deg,#607d8b,#90a4ae,#607d8b);box-shadow:0 4px 8px rgba(0,0,0,.15)}
+    .pan.left{left:4%;border-color:var(--left-dark)}.pan.left::before{background:linear-gradient(90deg,var(--left-dark),var(--left),var(--left-dark))}
+    .pan.right{right:4%;border-color:var(--right-dark)}.pan.right::before{background:linear-gradient(90deg,var(--right-dark),var(--right),var(--right-dark))}
+    .side-label{position:absolute;top:290px;width:30%;text-align:center;font-weight:900;font-size:.95rem;color:var(--muted);z-index:3;pointer-events:none}.side-label.left{left:3%}.side-label.right{right:3%}
+    .stack{display:flex;align-items:end;justify-content:center;gap:6px;width:100%;height:140px;position:relative;bottom:14px}.tower{display:flex;flex-direction:column-reverse;align-items:center;gap:3px;min-width:38px}
+    .item{cursor:grab;user-select:none;touch-action:none;width:38px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:.9rem;color:#152238;box-shadow:0 4px 8px rgba(0,0,0,.2);border:2px solid rgba(255,255,255,.55)}
+    .item:active{cursor:grabbing}.item.x{height:42px;background:linear-gradient(145deg,#90caf9,#42a5f5)}.item.negx{height:42px;background:linear-gradient(145deg,#ffb39d,#ff7043);color:#3b1a10}.item.unit{background:linear-gradient(145deg,#ffe082,#ffca28)}.item.negunit{background:linear-gradient(145deg,#ffab91,#ff7043);color:#3b1a10}
+    .dropzone{outline:4px dashed transparent;outline-offset:7px;transition:outline-color .16s ease,transform .16s ease}.dropzone.over{outline-color:rgba(91,124,250,.45);transform:scale(1.03)}
+    .status-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.status-card{background:#fff;border-radius:18px;padding:12px;text-align:center;box-shadow:0 8px 20px rgba(40,55,90,.1)}.status-card strong{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}.status-card span{font-weight:900;font-size:1.1rem}
+    .bottom-controls{margin-top:14px;border-radius:22px;padding:12px;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px}.custom-unit{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}.custom-unit input{width:90px;text-align:center}
+    .ghost{position:fixed;z-index:9999;pointer-events:none;opacity:.92;transform:translate(-50%,-50%) scale(1.05);min-width:72px}
+    @media (max-width:880px){header,.main-grid{grid-template-columns:1fr}.panel{order:2}.balance-card{order:1;min-height:470px}.balance{transform:scale(.92)}.tool-list,.remove-buttons{grid-template-columns:repeat(2,minmax(120px,1fr))}}
+    @media (max-width:560px){.app{width:98vw;padding-inline:6px}.balance-card{padding:8px}.balance{transform:scale(.78);width:640px}.balance-area{overflow-x:auto;justify-content:start}.status-row{grid-template-columns:1fr}.tool-list,.remove-buttons{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Simulador de balanza</h1>
+        <p class="hint">Arrastra bloques a cada plato. En ecuaciones, presiona Igualar para fijar el valor de x y sigue despejando.</p>
+      </div>
+      <div class="mode-card" aria-label="Selector de relación matemática">
+        <label for="relation">Tipo:</label>
+        <select id="relation">
+          <option value="=">Ecuación =</option>
+          <option value="<">Inecuación &lt;</option>
+          <option value=">">Inecuación &gt;</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="equation-box" aria-live="polite">
+      <div class="equation-label">Representación sobre la balanza</div>
+      <div class="equation" id="equationText">
+        <span class="leftTerm">0</span><span class="symbol">=</span><span class="rightTerm">0</span>
+      </div>
+    </section>
+
+    <main class="main-grid">
+      <aside class="panel">
+        <h2>Agregar arrastrando</h2>
+        <div class="tool-list">
+          <button class="draggable x-block" draggable="false" data-kind="x" data-value="1">x</button>
+          <button class="draggable unit-block" draggable="false" data-kind="unit" data-value="1">+1</button>
+          <button class="draggable neg-unit-block" draggable="false" data-kind="unit" data-value="-1">−1</button>
+        </div>
+        <p class="hint">Puedes sumar o restar unidades arrastrando +1 o −1 al lado que corresponda.</p>
+      </aside>
+
+      <section class="balance-card">
+        <div class="balance-area">
+          <div class="balance" aria-label="Balanza interactiva">
+            <div class="stand"></div>
+            <div class="base"></div>
+            <div class="beam-wrap" id="beamWrap">
+              <div class="beam"></div>
+              <div class="chain left-c1"></div>
+              <div class="chain left-c2"></div>
+              <div class="chain right-c1"></div>
+              <div class="chain right-c2"></div>
+              <div class="pan left dropzone" id="leftPan" data-side="left" aria-label="Plato izquierdo">
+                <div class="stack" id="leftStack"></div>
+              </div>
+              <div class="pan right dropzone" id="rightPan" data-side="right" aria-label="Plato derecho">
+                <div class="stack" id="rightStack"></div>
+              </div>
+            </div>
+            <div class="pivot"></div>
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-card"><strong>Izquierda</strong><span id="leftSummary">0</span></div>
+          <div class="status-card"><strong>Derecha</strong><span id="rightSummary">0</span></div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>Quitar elementos</h2>
+        <div class="remove-buttons">
+          <button onclick="removeItem('left','x')">Quitar x izquierda</button>
+          <button onclick="removeItem('right','x')">Quitar x derecha</button>
+          <button onclick="removeItem('left','unit')">Quitar unidad izquierda</button>
+          <button onclick="removeItem('right','unit')">Quitar unidad derecha</button>
+          <button class="danger" onclick="clearSide('left')">Vaciar izquierda</button>
+          <button class="danger" onclick="clearSide('right')">Vaciar derecha</button>
+        </div>
+        <p class="hint">También puedes arrastrar un bloque fuera del plato para eliminarlo, o llevarlo al otro plato para moverlo.</p>
+        <div class="language-box">
+          <h3>Lenguaje algebraico</h3>
+          <span class="mini-label">Ecuación o relación</span>
+          <div class="algebra-text" id="algebraicLanguage">0=0</div>
+          <span class="mini-label">Lenguaje verbal</span>
+          <div class="verbal-text" id="verbalLanguage">cero es igual a cero.</div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="bottom-controls">
+      <div class="custom-unit">
+        <label for="customValue"><strong>Unidad personalizada:</strong></label>
+        <input id="customValue" type="number" value="5" step="1" />
+        <button class="draggable unit-block" draggable="false" data-kind="custom" data-value="5" id="customDrag">Arrastrar valor</button>
+      </div>
+      <button onclick="applyBoth('x')">Agregar x a ambos lados</button>
+      <button onclick="applyBoth('unit',1)">Agregar +1 a ambos lados</button>
+      <button onclick="applyBoth('unit',-1)">Agregar −1 a ambos lados</button>
+      <button class="equalize" onclick="equalizeBalance()">Igualar</button>
+      <button class="danger" onclick="resetAll()">Reiniciar</button>
+    </section>
+  </div>
+
+  <script>
+    const state = { left: [], right: [] };
+
+    const relation = document.getElementById('relation');
+    const equationText = document.getElementById('equationText');
+    const leftStack = document.getElementById('leftStack');
+    const rightStack = document.getElementById('rightStack');
+    const leftSummary = document.getElementById('leftSummary');
+    const rightSummary = document.getElementById('rightSummary');
+    const beamWrap = document.getElementById('beamWrap');
+    const customValue = document.getElementById('customValue');
+    const customDrag = document.getElementById('customDrag');
+    const algebraicLanguage = document.getElementById('algebraicLanguage');
+    const verbalLanguage = document.getElementById('verbalLanguage');
+
+    let solvedX = null;
+    let solvedText = '';
+    let dragData = null;
+    let removeDragData = null;
+    let ghost = null;
+
+    function normalizeMinus(text){
+      return String(text).replaceAll('-', '−');
+    }
+
+    function formatNumberValue(value){
+      return Number.isInteger(value) ? String(value) : value.toFixed(2).replaceAll('.', ',');
+    }
+
+    function sideTotals(side){
+      return state[side].reduce((acc, item) => {
+        if(item.kind === 'x') acc.x += Number(item.value || 1);
+        if(item.kind === 'unit') acc.units += Number(item.value || 0);
+        return acc;
+      }, { x: 0, units: 0 });
+    }
+
+    function expression(side){
+      const total = sideTotals(side);
+      const parts = [];
+
+      if(total.x === 1) parts.push('x');
+      if(total.x > 1) parts.push(total.x + 'x');
+      if(total.x === -1) parts.push('−x');
+      if(total.x < -1) parts.push('−' + Math.abs(total.x) + 'x');
+
+      if(total.units > 0) parts.push(parts.length ? '+ ' + total.units : String(total.units));
+      if(total.units < 0) parts.push(parts.length ? '− ' + Math.abs(total.units) : '−' + Math.abs(total.units));
+
+      return parts.length ? parts.join(' ') : '0';
+    }
+
+    function compactExpression(side){
+      return expression(side).replaceAll(' ', '').replaceAll('−', '-');
+    }
+
+    function evaluateSide(side, xValue){
+      const total = sideTotals(side);
+      return total.x * xValue + total.units;
+    }
+
+    function numberToWords(n){
+      n = Number(n);
+      if(!Number.isFinite(n)) return String(n);
+      if(n < 0) return 'menos ' + numberToWords(Math.abs(n));
+      if(n % 1 !== 0) return String(n).replaceAll('.', ',');
+
+      const units = ['cero','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve'];
+      const tens = ['','','veinte','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'];
+      const hundreds = ['','ciento','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+
+      if(n < 20) return units[n];
+      if(n < 30) return n === 20 ? 'veinte' : 'veinti' + units[n - 20];
+      if(n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? ' y ' + units[n % 10] : '');
+      if(n === 100) return 'cien';
+      if(n < 1000) return hundreds[Math.floor(n / 100)] + (n % 100 ? ' ' + numberToWords(n % 100) : '');
+      return String(n);
+    }
+
+    function xPhrase(coef){
+      if(coef === 0) return '';
+      const abs = Math.abs(coef);
+      let phrase = '';
+
+      if(abs === 1) phrase = 'un número';
+      else if(abs === 2) phrase = 'el doble de un número';
+      else if(abs === 3) phrase = 'el triple de un número';
+      else phrase = numberToWords(abs) + ' veces un número';
+
+      return coef < 0 ? 'menos ' + phrase : phrase;
+    }
+
+    function verbalSide(side){
+      const total = sideTotals(side);
+      const parts = [];
+
+      if(total.x !== 0) parts.push(xPhrase(total.x));
+      if(total.units > 0) parts.push((parts.length ? 'más ' : '') + numberToWords(total.units));
+      if(total.units < 0) parts.push((parts.length ? 'menos ' : 'menos ') + numberToWords(Math.abs(total.units)));
+
+      return parts.length ? parts.join(' ') : 'cero';
+    }
+
+    function symbolToWords(symbol){
+      if(symbol === '=') return 'es igual a';
+      if(symbol === '<') return 'es menor que';
+      if(symbol === '>') return 'es mayor que';
+      return symbol;
+    }
+
+    function solveEquation(){
+      const left = sideTotals('left');
+      const right = sideTotals('right');
+      const xDiff = left.x - right.x;
+      const unitDiff = right.units - left.units;
+
+      if(xDiff === 0){
+        if(unitDiff === 0) return { kind: 'infinite', text: 'Infinitas soluciones' };
+        return { kind: 'none', text: 'Sin solución' };
+      }
+
+      const value = unitDiff / xDiff;
+      return { kind: 'unique', value, text: 'x = ' + formatNumberValue(value) };
+    }
+
+    function isXIsolated(){
+      const left = sideTotals('left');
+      const right = sideTotals('right');
+      const leftIsOnlyOneX = left.x === 1 && left.units === 0;
+      const rightIsOnlyOneX = right.x === 1 && right.units === 0;
+      const leftHasNoX = left.x === 0;
+      const rightHasNoX = right.x === 0;
+
+      return (leftIsOnlyOneX && rightHasNoX) || (rightIsOnlyOneX && leftHasNoX);
+    }
+
+    function getDisplayedSymbol(){
+      if(relation.value === '<' || relation.value === '>') return relation.value;
+
+      if(typeof solvedX === 'number' && Number.isFinite(solvedX)){
+        const leftValue = evaluateSide('left', solvedX);
+        const rightValue = evaluateSide('right', solvedX);
+        const eps = 0.000000001;
+
+        if(Math.abs(leftValue - rightValue) < eps) return '=';
+        return leftValue > rightValue ? '>' : '<';
+      }
+
+      return '=';
+    }
+
+    function dynamicMessage(){
+      if(relation.value === '<' || relation.value === '>') return solvedText;
+      if(typeof solvedX !== 'number' || !Number.isFinite(solvedX)) return solvedText;
+
+      const symbol = getDisplayedSymbol();
+      const xText = formatNumberValue(solvedX);
+
+      if(isXIsolated()){
+        if(symbol === '=') return 'Resultado: x = ' + xText;
+        return 'Con el valor fijado al igualar, x = ' + xText + '. La relación actual no está equilibrada.';
+      }
+
+      if(symbol === '=') return 'Balanza igualada. Sigue despejando hasta dejar una sola x en un lado.';
+      return 'La igualdad cambió. Revisa: no se hizo la misma operación en ambos lados.';
+    }
+
+    function updateEquationText(message = ''){
+      const leftExp = expression('left');
+      const rightExp = expression('right');
+      const symbol = getDisplayedSymbol();
+
+      equationText.innerHTML = `
+        <span class="leftTerm">${leftExp}</span>
+        <span class="symbol">${symbol}</span>
+        <span class="rightTerm">${rightExp}</span>
+        ${message ? `<div class="result-line">${message}</div>` : ''}
+      `;
+    }
+
+    function updateLanguageBox(){
+      const symbol = getDisplayedSymbol();
+      if(algebraicLanguage) algebraicLanguage.textContent = compactExpression('left') + symbol + compactExpression('right');
+      if(verbalLanguage) verbalLanguage.textContent = verbalSide('left') + ' ' + symbolToWords(symbol) + ' ' + verbalSide('right') + '.';
+    }
+
+    function renderStack(container, side){
+      container.innerHTML = '';
+      const withIndex = state[side].map((item, index) => ({ ...item, index }));
+      const xItems = withIndex.filter(item => item.kind === 'x' && Number(item.value || 1) > 0);
+      const negativeXItems = withIndex.filter(item => item.kind === 'x' && Number(item.value || 1) < 0);
+      const positiveUnits = withIndex.filter(item => item.kind === 'unit' && item.value > 0);
+      const negativeUnits = withIndex.filter(item => item.kind === 'unit' && item.value < 0);
+
+      const groups = [
+        { name: 'x', items: xItems },
+        { name: 'negx', items: negativeXItems },
+        { name: 'unit', items: positiveUnits },
+        { name: 'negunit', items: negativeUnits }
+      ];
+
+      groups.forEach(group => {
+        if(!group.items.length) return;
+
+        const tower = document.createElement('div');
+        tower.className = 'tower';
+
+        group.items.slice(-7).forEach(item => {
+          const block = document.createElement('div');
+          block.className = 'item ' + group.name + ' balance-item';
+          block.textContent = item.kind === 'x'
+            ? (Number(item.value || 1) < 0 ? '−x' : 'x')
+            : normalizeMinus(item.value > 0 ? '+' + item.value : item.value);
+          block.dataset.side = side;
+          block.dataset.index = item.index;
+          block.addEventListener('pointerdown', beginRemoveDrag);
+          tower.appendChild(block);
+        });
+
+        if(group.items.length > 7){
+          const extra = document.createElement('div');
+          extra.className = 'item ' + group.name;
+          extra.textContent = '+' + (group.items.length - 7);
+          tower.appendChild(extra);
+        }
+
+        container.appendChild(tower);
+      });
+    }
+
+    function setBeamTilt(deg){
+      beamWrap.getAnimations().forEach(animation => animation.cancel());
+      beamWrap.style.transform = '';
+      beamWrap.style.setProperty('--tilt', deg + 'deg');
+    }
+
+    function updateTilt(){
+      if(relation.value === '>'){
+        setBeamTilt(-8);
+        return;
+      }
+
+      if(relation.value === '<'){
+        setBeamTilt(8);
+        return;
+      }
+
+      let diff;
+
+      if(typeof solvedX === 'number' && Number.isFinite(solvedX)){
+        diff = evaluateSide('right', solvedX) - evaluateSide('left', solvedX);
+      }else{
+        const visualXWeight = 3;
+        const left = sideTotals('left');
+        const right = sideTotals('right');
+        const leftWeight = left.x * visualXWeight + left.units;
+        const rightWeight = right.x * visualXWeight + right.units;
+        diff = rightWeight - leftWeight;
+      }
+
+      const tilt = Math.max(-10, Math.min(10, diff * 2));
+      setBeamTilt(tilt);
+    }
+
+    function update(message = ''){
+      const finalMessage = message || dynamicMessage();
+      updateEquationText(finalMessage);
+      leftSummary.textContent = expression('left');
+      rightSummary.textContent = expression('right');
+      renderStack(leftStack, 'left');
+      renderStack(rightStack, 'right');
+      updateLanguageBox();
+      updateTilt();
+    }
+
+    function addItem(side, kind, value = 1){
+      if(kind === 'x') state[side].push({ kind: 'x', value: Number(value || 1) });
+      if(kind === 'unit') state[side].push({ kind: 'unit', value: Number(value) });
+      if(typeof solvedX !== 'number' || !Number.isFinite(solvedX)) solvedText = '';
+      update();
+    }
+
+    function removeItem(side, kind){
+      const index = [...state[side]]
+        .map((item, i) => ({ item, i }))
+        .reverse()
+        .find(({ item }) => item.kind === kind)?.i;
+
+      if(index !== undefined){
+        state[side].splice(index, 1);
+        if(typeof solvedX !== 'number' || !Number.isFinite(solvedX)) solvedText = '';
+        update();
+      }
+    }
+
+    function clearSide(side){
+      state[side] = [];
+      if(typeof solvedX !== 'number' || !Number.isFinite(solvedX)) solvedText = '';
+      update();
+    }
+
+    function resetAll(){
+      state.left = [];
+      state.right = [];
+      relation.value = '=';
+      solvedX = null;
+      solvedText = '';
+      update('');
+    }
+
+    function applyBoth(kind, value = 1){
+      addItem('left', kind, value);
+      addItem('right', kind, value);
+    }
+
+    function forceBalanceAnimation(finalTilt = 0){
+      beamWrap.getAnimations().forEach(animation => animation.cancel());
+      beamWrap.style.setProperty('--tilt', '0deg');
+
+      const animation = beamWrap.animate([
+        { transform: 'translateX(-50%) rotate(-7deg)' },
+        { transform: 'translateX(-50%) rotate(7deg)' },
+        { transform: 'translateX(-50%) rotate(-4deg)' },
+        { transform: 'translateX(-50%) rotate(4deg)' },
+        { transform: `translateX(-50%) rotate(${finalTilt}deg)` }
+      ], { duration: 1200, easing: 'ease-in-out', fill: 'forwards' });
+
+      animation.onfinish = () => {
+        beamWrap.style.transform = '';
+        beamWrap.style.setProperty('--tilt', finalTilt + 'deg');
+      };
+    }
+
+    function equalizeBalance(){
+      if(relation.value === '<' || relation.value === '>'){
+        solvedX = null;
+        solvedText = 'El botón Igualar solo funciona con ecuaciones (=).';
+        update(solvedText);
+        return;
+      }
+
+      if(typeof solvedX === 'number' && Number.isFinite(solvedX) && getDisplayedSymbol() !== '='){
+        solvedText = 'No se puede igualar: la relación ya no conserva el valor fijado. Usa Reiniciar o corrige la operación.';
+        update(solvedText);
+        return;
+      }
+
+      const result = solveEquation();
+
+      if(result.kind === 'unique'){
+        solvedX = result.value;
+        solvedText = '';
+        forceBalanceAnimation(0);
+        setTimeout(() => update(), 1220);
+        return;
+      }
+
+      solvedX = null;
+      solvedText = 'Resultado: ' + result.text;
+      forceBalanceAnimation(result.kind === 'infinite' ? 0 : 8);
+      setTimeout(() => update(solvedText), 1220);
+    }
+
+    customValue.addEventListener('input', () => {
+      const value = Number(customValue.value || 0);
+      customDrag.dataset.value = value;
+      customDrag.textContent = 'Arrastrar ' + normalizeMinus(value >= 0 ? '+' + value : value);
+      customDrag.className = 'draggable ' + (value < 0 ? 'neg-unit-block' : 'unit-block');
+    });
+
+    relation.addEventListener('change', () => {
+      solvedX = null;
+      solvedText = '';
+      update('');
+    });
+
+    function getEventPoint(e){
+      return { x: e.clientX, y: e.clientY };
+    }
+
+    function createGhost(source, point){
+      ghost = source.cloneNode(true);
+      ghost.classList.add('ghost');
+      document.body.appendChild(ghost);
+      moveGhost(point);
+    }
+
+    function moveGhost(point){
+      if(!ghost) return;
+      ghost.style.left = point.x + 'px';
+      ghost.style.top = point.y + 'px';
+    }
+
+    function zoneAt(point){
+      const zones = [...document.querySelectorAll('.dropzone')];
+      return zones.find(zone => {
+        const rect = zone.getBoundingClientRect();
+        return point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom;
+      });
+    }
+
+    function clearOver(){
+      document.querySelectorAll('.dropzone').forEach(zone => zone.classList.remove('over'));
+    }
+
+    function beginDrag(e){
+      const source = e.currentTarget;
+      const point = getEventPoint(e);
+      const kind = source.dataset.kind === 'custom' ? 'unit' : source.dataset.kind;
+      const value = Number(source.dataset.value || 1);
+
+      dragData = { kind, value };
+      createGhost(source, point);
+      document.addEventListener('pointermove', onDragMove);
+      document.addEventListener('pointerup', endDrag);
+      e.preventDefault();
+    }
+
+    function onDragMove(e){
+      if(!dragData) return;
+      const point = getEventPoint(e);
+      moveGhost(point);
+      clearOver();
+      const zone = zoneAt(point);
+      if(zone) zone.classList.add('over');
+    }
+
+    function endDrag(e){
+      if(!dragData) return;
+      const point = getEventPoint(e);
+      const zone = zoneAt(point);
+      if(zone) addItem(zone.dataset.side, dragData.kind, dragData.value);
+      clearOver();
+      if(ghost) ghost.remove();
+      ghost = null;
+      dragData = null;
+      document.removeEventListener('pointermove', onDragMove);
+      document.removeEventListener('pointerup', endDrag);
+    }
+
+    function beginRemoveDrag(e){
+      const source = e.currentTarget;
+      const point = getEventPoint(e);
+      removeDragData = { side: source.dataset.side, index: Number(source.dataset.index) };
+      createGhost(source, point);
+      source.style.opacity = '.35';
+      document.addEventListener('pointermove', onRemoveDragMove);
+      document.addEventListener('pointerup', endRemoveDrag);
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    function onRemoveDragMove(e){
+      if(!removeDragData) return;
+      const point = getEventPoint(e);
+      moveGhost(point);
+      clearOver();
+      const zone = zoneAt(point);
+      if(zone) zone.classList.add('over');
+    }
+
+    function endRemoveDrag(e){
+      if(!removeDragData) return;
+      const point = getEventPoint(e);
+      const zone = zoneAt(point);
+      const originalSide = removeDragData.side;
+      const targetSide = zone ? zone.dataset.side : null;
+      const item = state[originalSide][removeDragData.index];
+
+      if(item){
+        if(targetSide === originalSide){
+          // Se soltó en el mismo plato: no cambia nada.
+        }else{
+          state[originalSide].splice(removeDragData.index, 1);
+          if(targetSide && targetSide !== originalSide){
+            const useInverse = relation.value === '=' && typeof solvedX === 'number' && Number.isFinite(solvedX);
+            const movedValue = useInverse ? -Number(item.value || 1) : Number(item.value || 1);
+            state[targetSide].push({ kind: item.kind, value: movedValue });
+          }
+        }
+      }
+
+      clearOver();
+      if(ghost) ghost.remove();
+      document.querySelectorAll('.balance-item').forEach(item => item.style.opacity = '1');
+      ghost = null;
+      dragData = null;
+      removeDragData = null;
+      document.removeEventListener('pointermove', onRemoveDragMove);
+      document.removeEventListener('pointerup', endRemoveDrag);
+      update();
+    }
+
+    document.querySelectorAll('.draggable').forEach(btn => {
+      btn.addEventListener('pointerdown', beginDrag);
+    });
+
+    update();
+  </script>
+</body>
+</html>
